@@ -6,6 +6,14 @@ from sqlalchemy.orm import sessionmaker
 
 from models import engine, City, Station, BikeTerminal, Weather, Coordinates
 
+DBSession = sessionmaker(bind=engine)
+db = DBSession()
+
+current_directory = os.getcwd()
+data_directory = os.path.join(current_directory, 'data')
+
+CITIES = ['toulouse', 'lyon', 'paris']
+
 
 def remove_file_extension(filename):
     return os.path.splitext(os.path.basename(filename))[0]
@@ -72,7 +80,7 @@ def insert_weather_moments(city):
         db.commit()
 
 
-def insert_bikes_and_places():
+def insert_bikes_and_places(city):
     ''' Insert all bikes and places data for a city into SQL Database. '''
 
     click.secho('Inserting {} in db.slots'.format(city), fg='cyan')
@@ -96,20 +104,12 @@ def insert_bikes_and_places():
 def main():
     ''' Main function to compute data cleaning. '''
 
-    DBSession = sessionmaker(bind=engine)
-    db = DBSession()
-
-    current_directory = os.getcwd()
-    data_directory = os.path.join(current_directory, 'data')
-
-    CITIES = ['toulouse', 'lyon', 'paris']
-
     for city in CITIES:
         insert_city(city)
         insert_stations(city)
         insert_coordinates(city)
         insert_weather_moments(city)
-        insert_bikes_and_places()
+        # insert_bikes_and_places(city)
 
     db.close()
 
