@@ -97,3 +97,5 @@ ENV/
 
 # Challenge data
 data/
+*.csv
+*.zip
