@@ -18,7 +18,7 @@ Requirements:
   - `click==6.6`
   - `numpy==1.11.2`
   - `pandas==0.19.0`
-  - `SQLAlchemy==1.1.2`
+  - `sklearn==0.0`
 
 
 ```
@@ -27,12 +27,12 @@ pip install -r requirements.txt
 
 ### Usage
 
-Generate database models:
+Data wrangling:
 ```
-python models.py
+python get_data.py
 ```
 
-Then, insert tuples into database with:
+Training step:
 ```
-python insert_data.py
+python train.py
 ```
