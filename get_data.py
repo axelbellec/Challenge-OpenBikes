@@ -24,7 +24,8 @@ def extract_time_features(df):
 def add_weather_updates(city_df, city_name):
     weather_df = get_weather_updates(city_name)
     city_df.index = np.searchsorted(weather_df['moment'], city_df['moment'])
-    joined_df = pd.merge(left=city_df, right=weather_df, left_index=True, right_index=True, how='right')
+    joined_df = pd.merge(left=city_df, right=weather_df,
+                         left_index=True, right_index=True, how='right')
     joined_df.rename(columns={'moment_x': 'moment', 'moment_y': 'moment_weather'}, inplace=True)
     del joined_df['moment_weather']
     return joined_df
@@ -39,7 +40,7 @@ def add_station_coordinates(city_df, city_name):
 def read_test_dataset():
     to_predict_df = pd.read_csv('data/test-blank.csv', index_col=0)
     to_predict_df['moment'] = pd.to_datetime(to_predict_df.index)
-    to_predict_df['hour'] = to_predict_df['moment'].apply(lambda x: x.hour)
+    extract_time_features(to_predict_df)
     return to_predict_df
 
 
@@ -49,7 +50,7 @@ def main():
 
     df = pd.DataFrame()
     for city, station in city_stations:
-        # click.secho('Getting stations data for '.format(city), fg='cyan')
+        click.secho('Getting stations data for '.format(city), fg='cyan')
         print(city, station)
         df = df.append(get_station_updates(city, station))
 
