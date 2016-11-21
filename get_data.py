@@ -21,13 +21,15 @@ def extract_time_features(df):
     df['minute'] = df['moment'].apply(lambda m: m.minute)
 
 
-def add_weather_updates(city_df, city_name):
-    weather_df = get_weather_updates(city_name)
-    city_df.index = np.searchsorted(weather_df['moment'], city_df['moment'])
-    joined_df = pd.merge(left=city_df, right=weather_df,
-                         left_index=True, right_index=True, how='right')
-    joined_df.rename(columns={'moment_x': 'moment', 'moment_y': 'moment_weather'}, inplace=True)
-    del joined_df['moment_weather']
+def add_weather_updates(df, city_name):
+    w_df = get_weather_updates(city_name)
+    w_times = pd.Series(w_df['moment'].values, w_df['moment'])
+    w_times.sort_values(inplace=True)
+    df['moment_weather'] = w_times.reindex(df['moment'], method='nearest').values
+    joined_df = pd.merge(left=df, right=w_df, left_on='moment_weather',
+                         right_on='moment', suffixes=('', '_y'))
+    joined_df.drop('moment_y', 1, inplace=True)
+    joined_df.drop('moment_weather', 1, inplace=True)
     return joined_df
 
 
@@ -40,7 +42,8 @@ def add_station_coordinates(city_df, city_name):
 def read_test_dataset():
     to_predict_df = pd.read_csv('data/test-blank.csv', index_col=0)
     to_predict_df['moment'] = pd.to_datetime(to_predict_df.index)
-    extract_time_features(to_predict_df)
+    to_predict_df.reset_index(inplace=True)
+    to_predict_df.drop('index', axis=1, inplace=True)
     return to_predict_df
 
 
